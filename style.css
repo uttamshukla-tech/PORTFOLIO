@@ -33,47 +33,6 @@ body {
     background-attachment: fixed;
 }
 
-/* Animated background particles */
-/* .bg-particles {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.particle {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: var(--accent-cyan);
-    border-radius: 50%;
-    opacity: 0.3;
-    animation: float 20s infinite;
-}
-
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0) translateX(0);
-    }
-
-    25% {
-        transform: translateY(-100px) translateX(50px);
-    }
-
-    50% {
-        transform: translateY(-50px) translateX(-50px);
-    }
-
-    75% {
-        transform: translateY(-150px) translateX(30px);
-    }
-} */
-
 /* Main Container */
 .app-container {
     width: 90%;
