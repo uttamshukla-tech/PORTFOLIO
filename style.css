@@ -3,7 +3,8 @@
 :root {
     --bg-dark: #0a0e1a;
     --bg-secondary: #111827;
-    --glass-panel: rgba(10, 14, 26, 0.7); /* More transparent for canvas visibility */
+    /* CHANGED: Significantly reduced opacity (0.7 -> 0.1) for visibility */
+    --glass-panel: rgba(10, 14, 26, 0.1); 
     --accent-primary: #3b82f6;
     --accent-secondary: #8b5cf6;
     --accent-cyan: #06b6d4;
@@ -27,9 +28,10 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
+    /* Removed static gradients so canvas is the only background */
 }
 
-/* Canvas Styling - Sits behind everything */
+/* Canvas Styling - Sits clearly behind everything */
 #background-canvas {
     position: fixed;
     top: 0;
@@ -46,12 +48,17 @@ body {
     max-width: 1400px;
     min-height: 90vh;
     margin: 5vh auto;
-    background: var(--glass-panel);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    
+    /* Transparent Background Logic */
+    background: var(--glass-panel); /* Uses the new 0.1 opacity */
+    backdrop-filter: blur(10px); /* Keeps text readable without solid color */
+    -webkit-backdrop-filter: blur(10px);
+    
     border: 1px solid var(--border-color);
     border-radius: 24px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    /* Reduced shadow opacity to feel lighter */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+    
     display: flex;
     flex-direction: column;
     position: relative;
@@ -66,8 +73,11 @@ nav {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
-    background: rgba(10, 14, 26, 0.6);
+    
+    /* CHANGED: Made nav bar much more transparent */
+    background: rgba(10, 14, 26, 0.2);
     backdrop-filter: blur(10px);
+    
     position: sticky;
     top: 0;
     z-index: 100;
@@ -103,10 +113,11 @@ nav {
 
 .nav-btn:hover,
 .nav-btn.active {
-    background: var(--card-hover);
+    background: rgba(59, 130, 246, 0.2); /* Slightly more visible hover */
     border-color: var(--accent-primary);
     color: var(--accent-primary);
     transform: translateY(-2px);
+    backdrop-filter: blur(5px);
 }
 
 .home-btn {
@@ -182,6 +193,7 @@ nav {
     margin-bottom: 2rem;
     font-size: 0.85rem;
     color: var(--accent-cyan);
+    backdrop-filter: blur(5px);
 }
 
 .status-dot {
@@ -207,6 +219,8 @@ nav {
     -webkit-text-fill-color: transparent;
     line-height: 1.2;
     animation: slideUp 0.8s ease;
+    /* Added text shadow to ensure readability over animation */
+    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 
 @keyframes slideUp {
@@ -221,6 +235,7 @@ nav {
     max-width: 600px;
     margin: 0 auto 3rem;
     font-weight: 400;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
 
 .hero-tags {
@@ -239,6 +254,7 @@ nav {
     font-size: 0.9rem;
     color: var(--text-main);
     transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
 }
 
 .tag:hover {
@@ -265,6 +281,7 @@ nav {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     overflow: hidden;
+    backdrop-filter: blur(5px); /* Ensure readability */
 }
 
 .menu-card::before {
@@ -340,6 +357,7 @@ nav {
     color: var(--text-muted);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-decoration: none;
+    backdrop-filter: blur(5px);
 }
 
 .social-icon svg {
@@ -393,13 +411,14 @@ nav {
     display: flex;
     gap: 2rem;
     margin-bottom: 2.5rem;
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.03); /* Slight tint for readability */
     padding: 2rem;
     border-radius: 20px;
     border: 1px solid var(--border-color);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    backdrop-filter: blur(5px);
 }
 
 .item-row::before {
@@ -416,7 +435,7 @@ nav {
 
 .item-row:hover {
     border-color: var(--accent-primary);
-    background: rgba(59, 130, 246, 0.05);
+    background: rgba(59, 130, 246, 0.1);
     transform: translateX(10px);
 }
 
@@ -496,6 +515,7 @@ nav {
     font-size: 0.9rem;
     color: var(--accent-primary);
     font-weight: 500;
+    backdrop-filter: blur(5px);
 }
 
 /* Responsive */
