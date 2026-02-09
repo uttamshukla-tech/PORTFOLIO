@@ -34,7 +34,7 @@ body {
 }
 
 /* Animated background particles */
-.bg-particles {
+/* .bg-particles {
     position: fixed;
     top: 0;
     left: 0;
@@ -72,7 +72,7 @@ body {
     75% {
         transform: translateY(-150px) translateX(30px);
     }
-}
+} */
 
 /* Main Container */
 .app-container {
