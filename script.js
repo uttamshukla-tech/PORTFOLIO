@@ -1,31 +1,41 @@
 /**
- * Portfolio Logic
- * Includes Navigation and Dynamic Backgrounds
+ * Portfolio Animation & Navigation System
+ * Clean architecture with proper state management
  */
 
-// Canvas Setup
+// ==========================================
+// GLOBAL STATE
+// ==========================================
 const canvas = document.getElementById('background-canvas');
 const ctx = canvas.getContext('2d');
-let particlesArray = [];
-let animationId;
-let currentTab = 'home';
 
-// Resize Canvas
+const state = {
+    particlesArray: [],
+    animationId: null,
+    currentTab: 'home',
+    validPages: ['home', 'education', 'skills', 'experience']
+};
+
+// ==========================================
+// CANVAS MANAGEMENT
+// ==========================================
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
+
 window.addEventListener('resize', () => {
     resizeCanvas();
-    initAnimation(currentTab);
+    initAnimation(state.currentTab);
 });
+
 resizeCanvas();
 
 // ==========================================
-// ANIMATION CLASSES & LOGIC
+// PARTICLE CLASSES
 // ==========================================
 
-// 1. HOME: Constellation / Network Effect
+// Home: Constellation Network
 class ParticleHome {
     constructor() {
         this.x = Math.random() * canvas.width;
@@ -34,12 +44,15 @@ class ParticleHome {
         this.speedX = Math.random() * 1 - 0.5;
         this.speedY = Math.random() * 1 - 0.5;
     }
+
     update() {
         this.x += this.speedX;
         this.y += this.speedY;
+        
         if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
         if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
     }
+
     draw() {
         ctx.fillStyle = '#3b82f6';
         ctx.beginPath();
@@ -48,28 +61,7 @@ class ParticleHome {
     }
 }
 
-function handleHome() {
-    for (let i = 0; i < particlesArray.length; i++) {
-        particlesArray[i].update();
-        particlesArray[i].draw();
-
-        for (let j = i; j < particlesArray.length; j++) {
-            const dx = particlesArray[i].x - particlesArray[j].x;
-            const dy = particlesArray[i].y - particlesArray[j].y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance < 100) {
-                ctx.beginPath();
-                ctx.strokeStyle = `rgba(59, 130, 246, ${1 - distance / 100})`;
-                ctx.lineWidth = 0.5;
-                ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
-                ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
-                ctx.stroke();
-            }
-        }
-    }
-}
-
-// 2. EDUCATION: Rising Squares (Structure)
+// Education: Rising Squares
 class ParticleEdu {
     constructor() {
         this.x = Math.random() * canvas.width;
@@ -78,48 +70,48 @@ class ParticleEdu {
         this.speedY = Math.random() * 1 + 0.5;
         this.opacity = Math.random() * 0.5 + 0.1;
     }
+
     update() {
         this.y -= this.speedY;
+        
         if (this.y < 0 - this.size) {
             this.y = canvas.height + this.size;
             this.x = Math.random() * canvas.width;
         }
     }
+
     draw() {
-        ctx.fillStyle = `rgba(139, 92, 246, ${this.opacity})`; // Purple
+        ctx.fillStyle = `rgba(139, 92, 246, ${this.opacity})`;
         ctx.fillRect(this.x, this.y, this.size, this.size);
     }
 }
 
-function handleEdu() {
-    for (let i = 0; i < particlesArray.length; i++) {
-        particlesArray[i].update();
-        particlesArray[i].draw();
-    }
-}
-
-// 3. SKILLS: Matrix/Cyber Rain
+// Skills: Matrix Rain
 class ParticleSkill {
     constructor() {
         this.x = Math.floor(Math.random() * (canvas.width / 20)) * 20;
         this.y = Math.random() * -canvas.height;
         this.speedY = Math.random() * 5 + 2;
         this.value = Math.random() > 0.5 ? '1' : '0';
-        this.color = '#06b6d4'; // Cyan
+        this.color = '#06b6d4';
         this.changeInterval = Math.floor(Math.random() * 20 + 5);
         this.frameCounter = 0;
     }
+
     update() {
         this.y += this.speedY;
         this.frameCounter++;
+        
         if (this.frameCounter >= this.changeInterval) {
             this.value = Math.random() > 0.5 ? '1' : '0';
             this.frameCounter = 0;
         }
+        
         if (this.y > canvas.height) {
             this.y = Math.random() * -100;
         }
     }
+
     draw() {
         ctx.fillStyle = this.color;
         ctx.font = '14px monospace';
@@ -127,14 +119,7 @@ class ParticleSkill {
     }
 }
 
-function handleSkills() {
-    for (let i = 0; i < particlesArray.length; i++) {
-        particlesArray[i].update();
-        particlesArray[i].draw();
-    }
-}
-
-// 4. EXPERIENCE: Starfield / Flow
+// Experience: Starfield
 class ParticleExp {
     constructor() {
         this.x = Math.random() * canvas.width;
@@ -142,198 +127,244 @@ class ParticleExp {
         this.size = Math.random() * 2;
         this.speedX = Math.random() * 3 + 1;
     }
+
     update() {
         this.x += this.speedX;
+        
         if (this.x > canvas.width) {
             this.x = 0;
             this.y = Math.random() * canvas.height;
         }
     }
+
     draw() {
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
-        // Trail
+        
+        // Trail effect
         ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
         ctx.fillRect(this.x - 20, this.y - this.size, 20, this.size * 2);
     }
 }
 
-function handleExp() {
-    for (let i = 0; i < particlesArray.length; i++) {
-        particlesArray[i].update();
-        particlesArray[i].draw();
+// ==========================================
+// ANIMATION HANDLERS
+// ==========================================
+const animationHandlers = {
+    home: () => {
+        const particles = state.particlesArray;
+        
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+            
+            // Draw connections
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 100) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(59, 130, 246, ${1 - distance / 100})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+    },
+    
+    education: () => {
+        state.particlesArray.forEach(p => {
+            p.update();
+            p.draw();
+        });
+    },
+    
+    skills: () => {
+        state.particlesArray.forEach(p => {
+            p.update();
+            p.draw();
+        });
+    },
+    
+    experience: () => {
+        state.particlesArray.forEach(p => {
+            p.update();
+            p.draw();
+        });
     }
-}
+};
 
 // ==========================================
-// CONTROLLER
+// ANIMATION CONTROL
 // ==========================================
-
 function initAnimation(type) {
-    particlesArray = [];
-    let count = 80;
-    if (type === 'home') count = 80;
-    else if (type === 'education') count = 50;
-    else if (type === 'skills') count = 100;
-    else if (type === 'experience') count = 100;
-
+    // Validate type
+    if (!state.validPages.includes(type)) {
+        type = 'home';
+    }
+    
+    // Clear existing particles
+    state.particlesArray = [];
+    
+    // Particle counts per animation type
+    const particleCounts = {
+        home: 80,
+        education: 50,
+        skills: 100,
+        experience: 100
+    };
+    
+    // Particle classes per animation type
+    const particleClasses = {
+        home: ParticleHome,
+        education: ParticleEdu,
+        skills: ParticleSkill,
+        experience: ParticleExp
+    };
+    
+    const count = particleCounts[type];
+    const ParticleClass = particleClasses[type];
+    
+    // Create new particles
     for (let i = 0; i < count; i++) {
-        if (type === 'home') particlesArray.push(new ParticleHome());
-        else if (type === 'education') particlesArray.push(new ParticleEdu());
-        else if (type === 'skills') particlesArray.push(new ParticleSkill());
-        else if (type === 'experience') particlesArray.push(new ParticleExp());
+        state.particlesArray.push(new ParticleClass());
     }
 }
 
 function animate() {
-    // Clear canvas with slight fade for trail effects if desired, 
-    // but here we do full clear for crispness
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (currentTab === 'home') handleHome();
-    else if (currentTab === 'education') handleEdu();
-    else if (currentTab === 'skills') handleSkills();
-    else if (currentTab === 'experience') handleExp();
-
-    animationId = requestAnimationFrame(animate);
+    
+    const handler = animationHandlers[state.currentTab];
+    if (handler) {
+        handler();
+    }
+    
+    state.animationId = requestAnimationFrame(animate);
 }
 
-// Start
+// Start initial animation
 initAnimation('home');
 animate();
 
 // ==========================================
-// PAGE NAVIGATION
+// NAVIGATION SYSTEM
 // ==========================================
 
-function showPage(pageId) {
-    // Update Animation State
-    currentTab = pageId;
-    initAnimation(pageId);
-
-    // Standard Navigation Logic
-
-        document.querySelectorAll('.nav-btn, .home-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-
-    const targetPage = document.getElementById(pageId);
-    if (targetPage) {
-        setTimeout(() => {
-            targetPage.classList.add('active');
-            targetPage.scrollTop = 0;
-        }, 50);
-    }
-
-    const navButtons = document.querySelectorAll('.nav-btn');
-    navButtons.forEach(btn => {
-        if (btn.textContent.toLowerCase() === pageId) {
-            btn.classList.add('active');
-        }
-    });
-}
-
 /**
- * Portfolio Navigation Handler
- * Fixes Back Button & Refresh Issues
+ * Updates the visual state (DOM) without touching browser history
  */
-
-
-    // 1. Define all valid page IDs to prevent errors
-const validPages = ['home', 'education', 'skills', 'experience'];
-
-    // 2. Main function to display a specific section
-function showPage(pageId) {
-    // If the pageId is invalid (e.g. from a bad URL), default to home
-    if (!validPages.includes(pageId)) pageId = 'home';
-
-// -- VISUAL UPDATES --
-
+function updateView(pageId) {
+    // Validate page ID
+    if (!state.validPages.includes(pageId)) {
+        pageId = 'home';
+    }
+    
+    // Update animation state
+    state.currentTab = pageId;
+    initAnimation(pageId);
+    
     // Hide all pages
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
     });
-
-    // Show the specific page
+    
+    // Show target page
     const targetPage = document.getElementById(pageId);
     if (targetPage) {
         targetPage.classList.add('active');
-        window.scrollTo(0, 0); // Scroll to top
     }
-
-    // Update Navigation Buttons (highlight the active one)
+    
+    // Update navigation buttons
     document.querySelectorAll('.nav-btn, .home-btn').forEach(btn => {
-        // We check the onclick attribute to match the button to the page
-        // or check if the button text matches the pageId
-        if (btn.getAttribute('onclick')?.includes(`'${pageId}'`)) {
+        btn.classList.remove('active');
+        
+        // Match button to page by data attribute or text content
+        const btnPage = btn.getAttribute('data-page') || 
+                       btn.textContent.toLowerCase().trim();
+        
+        if (btnPage === pageId) {
             btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
         }
     });
-
-    // -- BROWSER HISTORY UPDATE --
     
-    // Only push a new state if we aren't already there
-    // This prevents "duplicate" history entries
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
+
+/**
+ * Main navigation function - updates view AND browser history
+ */
+function showPage(pageId) {
+    // Validate page ID
+    if (!state.validPages.includes(pageId)) {
+        pageId = 'home';
+    }
+    
+    // Update the view
+    updateView(pageId);
+    
+    // Update browser history only if different from current state
     if (history.state?.page !== pageId) {
-        const newUrl = window.location.pathname + '#' + pageId;
+        const newUrl = `${window.location.pathname}#${pageId}`;
         history.pushState({ page: pageId }, '', newUrl);
     }
 }
 
-// 3. Handle the "Back" and "Forward" buttons
+/**
+ * Handle browser back/forward buttons
+ */
 window.addEventListener('popstate', (event) => {
-    // If state exists (user pressed back), use it.
-    // If not (user arrived here directly), check the URL hash.
-    // If neither, default to 'home'.
-    const pageId = event.state?.page || window.location.hash.substring(1) || 'home';
+    const pageId = event.state?.page || 
+                   window.location.hash.substring(1) || 
+                   'home';
     
-    // We strictly update the VIEW only, avoiding pushState to prevent loops
-    updateViewOnly(pageId);
+    // Only update view, don't push new history
+    updateView(pageId);
 });
 
-// 4. Handle Page Refresh (Initial Load)
+/**
+ * Handle initial page load and refreshes
+ */
 window.addEventListener('DOMContentLoaded', () => {
-    // Get the part of the URL after # (e.g., #skills)
     const hash = window.location.hash.substring(1);
+    const initialPage = state.validPages.includes(hash) ? hash : 'home';
     
-    // If there is a hash, go there. Otherwise, home.
-    const initialPage = validPages.includes(hash) ? hash : 'home';
-
-    // Show the view immediately
-    updateViewOnly(initialPage);
+    // Set initial view
+    updateView(initialPage);
     
-    // Replace the current history entry so the "Back" button works correctly later
-    history.replaceState({ page: initialPage }, '', window.location.pathname + '#' + initialPage);
+    // Replace history state so back button works correctly
+    history.replaceState(
+        { page: initialPage }, 
+        '', 
+        `${window.location.pathname}#${initialPage}`
+    );
 });
-    
-// -- HELPER FUNCTION --
-// Updates the DOM classes without touching browser history
-// (Used by popstate and initial load to avoid creating duplicate history entries)
-function updateViewOnly(pageId) {
-    if (!validPages.includes(pageId)) pageId = 'home';
 
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
+/**
+ * Optional: Auto-attach click handlers if data-page attribute is used
+ * Usage: <button class="nav-btn" data-page="skills">Skills</button>
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-page]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const pageId = btn.getAttribute('data-page');
+            showPage(pageId);
+        });
     });
+});
 
-    const targetPage = document.getElementById(pageId);
-    if (targetPage) {
-        targetPage.classList.add('active');
+/**
+ * Cleanup on page unload (optional but good practice)
+ */
+window.addEventListener('beforeunload', () => {
+    if (state.animationId) {
+        cancelAnimationFrame(state.animationId);
     }
-
-    document.querySelectorAll('.nav-btn, .home-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.getAttribute('onclick')?.includes(`'${pageId}'`)) {
-            btn.classList.add('active');
-        }
-    });
-}
-
+});
