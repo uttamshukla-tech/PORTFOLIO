@@ -61,6 +61,27 @@ class ParticleHome {
     }
 }
 
+function handleHome() {
+    for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+        particlesArray[i].draw();
+
+        for (let j = i; j < particlesArray.length; j++) {
+            const dx = particlesArray[i].x - particlesArray[j].x;
+            const dy = particlesArray[i].y - particlesArray[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < 100) {
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(59, 130, 246, ${1 - distance / 100})`;
+                ctx.lineWidth = 0.5;
+                ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                ctx.stroke();
+            }
+        }
+    }
+}
+
 // Education: Rising Squares
 class ParticleEdu {
     constructor() {
@@ -83,6 +104,13 @@ class ParticleEdu {
     draw() {
         ctx.fillStyle = `rgba(139, 92, 246, ${this.opacity})`;
         ctx.fillRect(this.x, this.y, this.size, this.size);
+    }
+}
+
+function handleEdu() {
+    for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+        particlesArray[i].draw();
     }
 }
 
@@ -119,6 +147,13 @@ class ParticleSkill {
     }
 }
 
+function handleSkills() {
+    for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+        particlesArray[i].draw();
+    }
+}
+
 // Experience: Starfield
 class ParticleExp {
     constructor() {
@@ -146,6 +181,13 @@ class ParticleExp {
         // Trail effect
         ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
         ctx.fillRect(this.x - 20, this.y - this.size, 20, this.size * 2);
+    }
+}
+
+function handleExp() {
+    for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+        particlesArray[i].draw();
     }
 }
 
